@@ -100,6 +100,14 @@ def gcd(m: int, n: int, *args: int):
         return gcd(n, m % n)
 
 
+def round_sig(a, k):
+    """Round a to k significant digits and remove trailing zeros."""
+    result = float(f'{a + 1e-15:.{k}g}')
+    if result % 1:
+        return result
+    return int(result)
+
+
 def frac_simplify(a, b):
     return a // gcd(a, b), b // gcd(a, b)
 
@@ -122,6 +130,27 @@ def fraction_subtraction(a, b, c, d):
     numerator = a * d - b * c
     denominator = b * d
     return frac_simplify(numerator, denominator)
+
+
+def sqrt_simplify(n):
+    if n < 0:
+        raise ValueError
+    i = 2
+    a = 1
+    while i * i <= n:
+        if n % (i * i) == 0:
+            a *= i
+            n //= i * i
+        else:
+            i = i + 1
+    if n == 0:
+        return "$0$"
+    elif n == 1:
+        return f"${a}$"
+    elif a == 1:
+        return f"$\\sqrt{{{n}}}$"
+    else:
+        return f"${a}\\sqrt{{{n}}}$"
 
 
 def valid_metric(unit):
