@@ -100,6 +100,34 @@ def gcd(m: int, n: int, *args: int):
         return gcd(n, m % n)
 
 
+def cast_int(a):
+    if a % 1:
+        return a
+    else:
+        return int(a)
+
+
+def median(num_list: list):
+    n = len(num_list)
+    sorted_list = sorted(num_list)
+    if n % 2:
+        return sorted_list[(n - 1) // 2]
+    else:
+        return (sorted_list[n // 2] + sorted_list[n // 2 - 1]) / 2
+
+
+def interquartile_range(num_list: list):
+    n = len(num_list)
+    sorted_list = sorted(num_list)
+    if n % 2:
+        list_1 = sorted_list[0:(n - 3) // 2]
+        list_2 = sorted_list[(n + 1) // 2:]
+    else:
+        list_1 = sorted_list[0:n // 2 - 1]
+        list_2 = sorted_list[n // 2 + 1:]
+    return median(list_2) - median(list_1)
+
+
 def round_sig(a, k):
     """Round a to k significant digits and remove trailing zeros."""
     result = float(f'{a + 1e-15:.{k}g}')
