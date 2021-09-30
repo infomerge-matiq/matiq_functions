@@ -101,10 +101,7 @@ def gcd(m: int, n: int, *args: int):
 
 
 def cast_int(a):
-    if a % 1:
-        return a
-    else:
-        return int(a)
+    return a if a % 1 else int(a)
 
 
 def median(num_list: list):
@@ -131,9 +128,7 @@ def interquartile_range(num_list: list):
 def round_sig(a, k):
     """Round a to k significant digits and remove trailing zeros."""
     result = float(f'{a + 1e-15:.{k}g}')
-    if result % 1:
-        return result
-    return int(result)
+    return cast_int(result)
 
 
 def frac_simplify(a, b):
@@ -344,3 +339,49 @@ def angle_drawing(x_angle, y_angle=0, radius=4, shaded_radius=1):
       \end{tikzpicture}
     ''' % (x_angle, radius, y_angle, radius, shaded_radius)
     return model
+
+
+def triangle_area(a, b, c):
+    area = 1 / 2 * (a[0] * (b[1] - c[1]) +
+                    b[0] * (c[1] - a[1]) +
+                    c[0] * (a[1] - b[1]))
+    return area
+
+
+def minutes_to_time(minutes: int):
+    if not 0 <= minutes < 1440:
+        raise ValueError("Minutes must be between 0 and 1439.")
+    h = minutes // 60
+    m = minutes % 60
+    if len(str(h)) == 1:
+        time_string = '0' + str(h)
+    else:
+        time_string = str(h)
+    if len(str(m)) == 1:
+        time_string += ':0' + str(m)
+    else:
+        time_string += ':' + str(m)
+    return time_string
+
+
+def draw_table(data: list):
+    num_columns = len(data[0])
+    for row in data:
+        if len(row) != num_columns:
+            raise ValueError("Rows are not of fixed length.")
+    table = r'''
+    \begin{center}
+    \begin{tabular}{||%s||}
+    \hline
+    %s \\ [0.5ex]
+    \hline''' % (' | '.join('c' * num_columns), ' & '.join(data[0]))
+    for row in data[1:]:
+        row_tex = r'''
+        %s \\
+        \hline''' % (' & '.join(row))
+        table += row_tex
+    table += r'''
+    \end{tabular}
+    \end{center}
+    '''
+    return table
