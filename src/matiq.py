@@ -385,3 +385,28 @@ def draw_table(data: list):
     \end{center}
     '''
     return table
+
+
+def draw_triangle(size=1.5, colour='yellow', rotate=90):
+    triangle = r'''
+    \tikz \node[isosceles triangle, minimum size=%sem, 
+    text opacity=0, rotate=%s, draw=%s,fill=%s] (T) {};
+    ''' % (size, rotate, colour, colour)
+    return triangle
+
+
+def draw_square(size=2, colour='red'):
+    square = r'''
+     \tikz \node[regular polygon, regular polygon sides=4, 
+     text opacity=0, minimum size=%sem, 
+     draw=%s,fill=%s] (S) {};
+    ''' % (size, colour, colour)
+    return square
+
+
+def draw_circle(size=1.5, colour='blue'):
+    circle = r'''
+    \tikz \node[circle, text opacity=0, minimum size=%sem,
+     draw=%s,fill=%s] (c) {};
+    ''' % (size, colour, colour)
+    return circle
