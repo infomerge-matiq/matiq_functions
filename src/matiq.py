@@ -387,11 +387,11 @@ def draw_table(data: list):
     return table
 
 
-def draw_triangle(size=1.5, colour='yellow', rotate=90):
+def draw_triangle(size=1.5, draw='yellow', fill='yellow', rotate=90):
     triangle = r'''
     \tikz \node[isosceles triangle, minimum size=%sem, 
     text opacity=0, rotate=%s, draw=%s,fill=%s] (T) {};
-    ''' % (size, rotate, colour, colour)
+    ''' % (size, rotate, draw, fill)
     return triangle
 
 
@@ -404,9 +404,29 @@ def draw_square(size=2, colour='red'):
     return square
 
 
-def draw_circle(size=1.5, colour='blue'):
+def draw_circle(size=1.5, fill='blue', draw='blue'):
     circle = r'''
     \tikz \node[circle, text opacity=0, minimum size=%sem,
      draw=%s,fill=%s] (c) {};
-    ''' % (size, colour, colour)
+    ''' % (size, draw, fill)
     return circle
+
+
+def draw_regular_polygon(sides, size = 2):
+    shape = r"""
+            \begin{tikzpicture} 
+            \node[regular polygon, regular polygon sides=%s, minimum size=%scm, 
+            draw] at (0, 0) {};
+            \end{tikzpicture}
+            """ % (sides, size)
+    return shape
+
+
+def draw_semi_circle(radius = 1.5):
+    shape = r"""
+            \begin{tikzpicture} 
+            [baseline=(current bounding box.north)] 
+            \draw (-%s,0) -- (%s,0) arc(0:180:%s) --cycle; 
+            \end{tikzpicture}
+            """ % (radius, radius, radius)
+    return shape
