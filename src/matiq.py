@@ -369,7 +369,7 @@ def draw_table(data: list):
     for row in data:
         if len(row) != num_columns:
             raise ValueError("Rows are not of fixed length.")
-    table = r'''
+    table = r''' 
     \begin{center}
     \begin{tabular}{||%s||}
     \hline
