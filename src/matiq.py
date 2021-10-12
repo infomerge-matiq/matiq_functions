@@ -125,7 +125,7 @@ def interquartile_range(num_list: list):
     return median(list_2) - median(list_1)
 
 
-def round_sig(a, k):
+def round_sig(a, k=1):
     """Round a to k significant digits and remove trailing zeros."""
     result = float(f'{a + 1e-15:.{k}g}')
     return cast_int(result)
@@ -167,13 +167,20 @@ def sqrt_simplify(n):
         else:
             i = i + 1
     if n == 0:
-        return "$0$"
+        return '$0$'
     elif n == 1:
-        return f"${a}$"
+        return f'${a}$'
     elif a == 1:
-        return f"$\\sqrt{{{n}}}$"
+        return f'$\\sqrt{{{n}}}$'
     else:
-        return f"${a}\\sqrt{{{n}}}$"
+        return f'${a}\\sqrt{{{n}}}$'
+
+
+def triangle_area(a, b, c):
+    area = - 1 / 2 * (a[0] * (b[1] - c[1]) +
+                      b[0] * (c[1] - a[1]) +
+                      c[0] * (a[1] - b[1]))
+    return area
 
 
 def valid_metric(unit):
@@ -258,7 +265,7 @@ def time_unit_converter(number, unit_in, unit_out):
 
 
 def time_to_words(h: int, m: int):
-    if h not in range(0, 13):
+    if h not in range(1, 13):
         raise ValueError("Hour invalid.")
     nums = ['twelve', 'one', 'two', 'three', 'four',
             'five', 'six', 'seven', 'eight', 'nine',
@@ -280,25 +287,33 @@ def time_to_words(h: int, m: int):
         raise ValueError("Minute invalid.")
 
 
-def analogue_clock(hour, minute):
+def minutes_to_time(minutes: int):
+    if not 0 <= minutes < 1440:
+        raise ValueError("Minutes must be between 0 and 1439.")
+    h = str(minutes // 60)
+    m = str(minutes % 60)
+    return '0' * (2 - len(h)) + h + ':' + '0' * (2 - len(m)) + m
+
+
+def analogue_clock(hour, minute, center=True):
     hour_angle = (90 - 30 * (hour % 12)) % 360 - 0.5 * minute
     minute_angle = (90 - 6 * minute) % 360
     clock = r'''
-    \begin{center}
-    \begin{tikzpicture}[line cap=rect, line width=3pt]
-    \filldraw [fill=white] (0,0) circle [radius=1.3cm];
-    \foreach \angle [count=\xi] in {60,30,...,-270}
-      {
-        \draw[line width=1pt] (\angle:1.15cm) -- (\angle:1.3cm);
-        \node[font=\large] at (\angle:0.9cm) {\textsf{\xi}};
-      }
-    \foreach \angle in {0,90,180,270}
-    \draw[line width=1.5pt] (\angle:1.1cm) -- (\angle:1.3cm);
-    \draw (0,0) -- (%f:0.65cm);
-    \draw (0,0) -- (%f:0.9cm);
-    \end{tikzpicture}
-    \end{center}
-    ''' % (hour_angle, minute_angle)
+            \begin{tikzpicture}[line cap=rect, line width=3pt]
+            \filldraw [fill=white] (0,0) circle [radius=1.3cm];
+            \foreach \angle [count=\xi] in {60,30,...,-270}
+              {
+                \draw[line width=1pt] (\angle:1.15cm) -- (\angle:1.3cm);
+                \node[font=\large] at (\angle:0.9cm) {\textsf{\xi}};
+              }
+            \foreach \angle in {0,90,180,270}
+            \draw[line width=1.5pt] (\angle:1.1cm) -- (\angle:1.3cm);
+            \draw (0,0) -- (%f:0.65cm);
+            \draw (0,0) -- (%f:0.9cm);
+            \end{tikzpicture}
+            ''' % (hour_angle, minute_angle)
+    if center:
+        clock = r'\begin{center}' + '\n' + clock + '\n' + r'\end{center}'
     return clock
 
 
@@ -308,60 +323,36 @@ def num_line(denominator, additional="", length=6, labelled=False):
     else:
         label = ''
     model = r'''
-    \begin{tikzpicture}[font=\Large]
-      \draw[line width = 1pt] (0,0) -- (%f,0);
-      \foreach \x in {0,%f}
-        {\draw [shift={(\x, 0)}, color=black, line width = 1pt] 
-        (0pt,6pt) -- (0pt,-6pt);}
-      \foreach \x in {1,...,%d} 
-        {\draw [shift={(\x * %f/%d,0)}, color=black] 
-          (0pt,5pt) -- (0pt,-5pt) %s;}
-      \draw (0, -6pt) node[below]{0};
-      \draw (%f, -6pt) node[below]{1};
-    %s
-    \end{tikzpicture}
-    ''' % (length, length, denominator - 1, length, denominator, label, length,
-           additional)
-
+            \begin{tikzpicture}[font=\Large]
+            \draw[line width = 1pt] (0,0) -- (%f,0);
+            \foreach \x in {0,%f}
+              {\draw [shift={(\x, 0)}, color=black, line width = 1pt] 
+              (0pt,6pt) -- (0pt,-6pt);}
+            \foreach \x in {1,...,%d} 
+              {\draw [shift={(\x * %f/%d,0)}, color=black] 
+                (0pt,5pt) -- (0pt,-5pt)%s;}
+            \draw (0, -6pt) node[below]{0};
+            \draw (%f, -6pt) node[below]{1};
+            %s
+            \end{tikzpicture}
+            ''' % (length, length, denominator - 1, length, denominator, label,
+                   length, additional)
     return model
 
 
-def angle_drawing(x_angle, y_angle=0, radius=4, shaded_radius=1):
+def draw_angle(x_angle, y_angle=0, radius=4, shaded_radius=1):
     model = r'''
-      \begin{tikzpicture}
-      \draw
-      (%f:%fcm) coordinate (a)
-      -- (0:0) coordinate (b)
-      -- (%f:%fcm) coordinate (c)
-      pic[draw=blue!50!black, fill=blue!20, angle eccentricity=1.2, 
-          angle radius=%fcm]
-      {angle=c--b--a};
-      \end{tikzpicture}
-    ''' % (x_angle, radius, y_angle, radius, shaded_radius)
+            \begin{tikzpicture}
+            \draw
+            (%f:%fcm) coordinate (a)
+            -- (0:0) coordinate (b)
+            -- (%f:%fcm) coordinate (c)
+            pic[draw=blue!50!black, fill=blue!20, angle eccentricity=1.2, 
+                angle radius=%fcm]
+            {angle=c--b--a};
+            \end{tikzpicture}
+            ''' % (x_angle, radius, y_angle, radius, shaded_radius)
     return model
-
-
-def triangle_area(a, b, c):
-    area = 1 / 2 * (a[0] * (b[1] - c[1]) +
-                    b[0] * (c[1] - a[1]) +
-                    c[0] * (a[1] - b[1]))
-    return area
-
-
-def minutes_to_time(minutes: int):
-    if not 0 <= minutes < 1440:
-        raise ValueError("Minutes must be between 0 and 1439.")
-    h = minutes // 60
-    m = minutes % 60
-    if len(str(h)) == 1:
-        time_string = '0' + str(h)
-    else:
-        time_string = str(h)
-    if len(str(m)) == 1:
-        time_string += ':0' + str(m)
-    else:
-        time_string += ':' + str(m)
-    return time_string
 
 
 def draw_table(data: list):
@@ -370,15 +361,17 @@ def draw_table(data: list):
         if len(row) != num_columns:
             raise ValueError("Rows are not of fixed length.")
     table = r''' 
-    \begin{center}
-    \begin{tabular}{||%s||}
-    \hline
-    %s \\ [0.5ex]
-    \hline''' % (' | '.join('c' * num_columns), ' & '.join(data[0]))
+            \begin{center}
+            \begin{tabular}{||%s||}
+            \hline
+            %s \\ [0.5ex]
+            \hline
+    ''' % (' | '.join('c' * num_columns), ' & '.join(data[0]))
     for row in data[1:]:
         row_tex = r'''
-        %s \\
-        \hline''' % (' & '.join(row))
+                  %s \\
+                  \hline
+                  ''' % (' & '.join(row))
         table += row_tex
     table += r'''
     \end{tabular}
@@ -389,44 +382,44 @@ def draw_table(data: list):
 
 def draw_triangle(size=1.5, draw='yellow', fill='yellow', rotate=90):
     triangle = r'''
-    \tikz \node[isosceles triangle, minimum size=%sem, 
-    text opacity=0, rotate=%s, draw=%s,fill=%s] (T) {};
-    ''' % (size, rotate, draw, fill)
+               \tikz \node[isosceles triangle, minimum size=%sem, 
+               text opacity=0, rotate=%s, draw=%s,fill=%s] (T) {};
+               ''' % (size, rotate, draw, fill)
     return triangle
 
 
 def draw_square(size=2, colour='red'):
     square = r'''
-     \tikz \node[regular polygon, regular polygon sides=4, 
-     text opacity=0, minimum size=%sem, 
-     draw=%s,fill=%s] (S) {};
-    ''' % (size, colour, colour)
+             \tikz \node[regular polygon, regular polygon sides=4, 
+             text opacity=0, minimum size=%sem, 
+             draw=%s,fill=%s] (S) {};
+             ''' % (size, colour, colour)
     return square
 
 
 def draw_circle(size=1.5, fill='blue', draw='blue'):
     circle = r'''
-    \tikz \node[circle, text opacity=0, minimum size=%sem,
-     draw=%s,fill=%s] (c) {};
-    ''' % (size, draw, fill)
+             \tikz \node[circle, text opacity=0, minimum size=%sem,
+              draw=%s,fill=%s] (c) {};
+             ''' % (size, draw, fill)
     return circle
 
 
-def draw_regular_polygon(sides, size = 2):
-    shape = r"""
-            \begin{tikzpicture} 
-            \node[regular polygon, regular polygon sides=%s, minimum size=%scm, 
-            draw] at (0, 0) {};
-            \end{tikzpicture}
-            """ % (sides, size)
-    return shape
-
-
-def draw_semi_circle(radius = 1.5):
-    shape = r"""
+def draw_semi_circle(radius=1.5):
+    shape = r'''
             \begin{tikzpicture} 
             [baseline=(current bounding box.north)] 
             \draw (-%s,0) -- (%s,0) arc(0:180:%s) --cycle; 
             \end{tikzpicture}
-            """ % (radius, radius, radius)
+            ''' % (radius, radius, radius)
+    return shape
+
+
+def draw_regular_polygon(sides, size=2):
+    shape = r'''
+            \begin{tikzpicture} 
+            \node[regular polygon, regular polygon sides=%s, minimum size=%scm, 
+            draw] at (0, 0) {};
+            \end{tikzpicture}
+            ''' % (sides, size)
     return shape

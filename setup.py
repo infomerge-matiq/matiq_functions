@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="matiq",
-    version="0.0.4",
+    version="0.0.6",
     author="Ali Sever",
     author_email='alisever96@hotmail.com',
     description="Package for Matiq Tests",
