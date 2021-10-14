@@ -265,7 +265,7 @@ def time_unit_converter(number, unit_in, unit_out):
 
 
 def time_to_words(h: int, m: int):
-    if h not in range(1, 13):
+    if h not in range(13):
         raise ValueError("Hour invalid.")
     nums = ['twelve', 'one', 'two', 'three', 'four',
             'five', 'six', 'seven', 'eight', 'nine',
@@ -423,3 +423,37 @@ def draw_regular_polygon(sides, size=2):
             \end{tikzpicture}
             ''' % (sides, size)
     return shape
+
+
+def ruler(length=7, additional='', unit='cm'):
+    scale = (length - 0.2) / 10
+    if unit in ['m', 'metres', 'meters']:
+        text_scale = 0.5
+        power = 10
+    else:
+        text_scale = 0.7
+        power = 1
+    draw = r'''
+    \begin{tikzpicture}
+            \draw (-0.2,0) rectangle (%f,1);
+            %% lower divisions
+            \foreach \x in {0,1,...,10}{
+            \draw (\x * %f,1) -- (\x * %f,0.75)node[below,scale=%f] 
+              {\pgfmathparse{%f *\x} \pgfmathprintnumber{\pgfmathresult}};
+            }
+            \foreach \x in {0.5,1,...,9.5}{
+            \draw (\x * %f,1) -- (\x * %f,0.8);
+            }
+    ''' % (length, scale, scale, text_scale, power, scale, scale, )
+
+    if unit not in ['mm', 'millimetres', 'millimeters']:
+        draw += r'''
+        \foreach \x in {0.1,0.2,...,9.9}
+        {\draw (\x * %f,1) -- (\x * %f,0.875);}''' % (scale, scale)
+        tag = 'cm'
+    else:
+        tag = 'mm'
+
+    draw += r'\draw (-0.2, 0.125) node[right, scale = 0.7]{%s};' \
+            r'%s \end{tikzpicture}' % (tag, additional)
+    return draw
