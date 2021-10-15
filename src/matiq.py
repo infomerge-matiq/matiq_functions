@@ -434,22 +434,22 @@ def ruler(length=7, additional='', unit='cm'):
         text_scale = 0.7
         power = 1
     draw = r'''
-    \begin{tikzpicture}
-            \draw (-0.2,0) rectangle (%f,1);
-            %% lower divisions
-            \foreach \x in {0,1,...,10}{
-            \draw (\x * %f,1) -- (\x * %f,0.75)node[below,scale=%f] 
-              {\pgfmathparse{%f *\x} \pgfmathprintnumber{\pgfmathresult}};
-            }
-            \foreach \x in {0.5,1,...,9.5}{
-            \draw (\x * %f,1) -- (\x * %f,0.8);
-            }
-    ''' % (length, scale, scale, text_scale, power, scale, scale, )
+           \begin{tikzpicture}
+           \draw (-0.2,0) rectangle (%f,1);
+           %% lower divisions
+           \foreach \x in {0,1,...,10}{
+           \draw (\x * %f,1) -- (\x * %f,0.75)node[below,scale=%f] 
+             {\pgfmathparse{%f *\x} \pgfmathprintnumber{\pgfmathresult}};
+           }
+           \foreach \x in {0.5,1,...,9.5}{
+           \draw (\x * %f,1) -- (\x * %f,0.8);
+           }
+           ''' % (length, scale, scale, text_scale, power, scale, scale)
 
     if unit not in ['mm', 'millimetres', 'millimeters']:
         draw += r'''
-        \foreach \x in {0.1,0.2,...,9.9}
-        {\draw (\x * %f,1) -- (\x * %f,0.875);}''' % (scale, scale)
+                \foreach \x in {0.1,0.2,...,9.9}
+                {\draw (\x * %f,1) -- (\x * %f,0.875);}''' % (scale, scale)
         tag = 'cm'
     else:
         tag = 'mm'
