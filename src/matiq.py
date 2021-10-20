@@ -388,12 +388,12 @@ def draw_triangle(size=1.5, draw='yellow', fill='yellow', rotate=90):
     return triangle
 
 
-def draw_square(size=2, colour='red'):
+def draw_square(size=2, colour='red', rotate=0):
     square = r'''
              \tikz \node[regular polygon, regular polygon sides=4, 
              text opacity=0, minimum size=%sem, 
-             draw=%s,fill=%s] (S) {};
-             ''' % (size, colour, colour)
+             draw=%s,fill=%s, rotate=%s] (S) {};
+             ''' % (size, colour, colour, rotate)
     return square
 
 
