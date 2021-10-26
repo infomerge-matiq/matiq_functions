@@ -317,7 +317,8 @@ def analogue_clock(hour, minute, center=True):
     return clock
 
 
-def num_line(denominator, additional="", length=6, labelled=False):
+def num_line(
+        denominator, additional="", length=6, labelled=False, start=0, end=1):
     if labelled:
         label = r' node[below] {$\frac{\x}{%d}$}' % denominator
     else:
@@ -331,12 +332,12 @@ def num_line(denominator, additional="", length=6, labelled=False):
             \foreach \x in {1,...,%d} 
               {\draw [shift={(\x * %f/%d,0)}, color=black] 
                 (0pt,5pt) -- (0pt,-5pt)%s;}
-            \draw (0, -6pt) node[below]{0};
-            \draw (%f, -6pt) node[below]{1};
+            \draw (0, -6pt) node[below]{%s};
+            \draw (%f, -6pt) node[below]{%s};
             %s
             \end{tikzpicture}
             ''' % (length, length, denominator - 1, length, denominator, label,
-                   length, additional)
+                   start, length, end, additional)
     return model
 
 
@@ -388,12 +389,12 @@ def draw_triangle(size=1.5, draw='yellow', fill='yellow', rotate=90):
     return triangle
 
 
-def draw_square(size=2, colour='red', rotate=0):
+def draw_square(size=2, draw='red', fill='red', rotate=0):
     square = r'''
              \tikz \node[regular polygon, regular polygon sides=4, 
              text opacity=0, minimum size=%sem, 
              draw=%s,fill=%s, rotate=%s] (S) {};
-             ''' % (size, colour, colour, rotate)
+             ''' % (size, draw, fill, rotate)
     return square
 
 
