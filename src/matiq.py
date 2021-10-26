@@ -317,8 +317,7 @@ def analogue_clock(hour, minute, center=True):
     return clock
 
 
-def num_line(
-        denominator, additional="", length=6, labelled=False, start=0, end=1):
+def num_line(denominator, extra='', length=6, labelled=False, start=0, end=1):
     if labelled:
         label = r' node[below] {$\frac{\x}{%d}$}' % denominator
     else:
@@ -337,7 +336,7 @@ def num_line(
             %s
             \end{tikzpicture}
             ''' % (length, length, denominator - 1, length, denominator, label,
-                   start, length, end, additional)
+                   start, length, end, extra)
     return model
 
 
