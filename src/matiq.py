@@ -457,3 +457,56 @@ def ruler(length=7, additional='', unit='cm'):
     draw += r'\draw (-0.2, 0.125) node[right, scale = 0.7]{%s};' \
             r'%s \end{tikzpicture}' % (tag, additional)
     return draw
+
+
+def draw_random_shape(polygon, curves=2, sides=4):
+    width = 3
+    check = [3, 4]
+    my_list = "\\ ".join([str(j) for j in check])
+    if sides not in check:
+        raise NameError(f"Sides must be either {my_list}")
+    sides = sides
+
+
+    if polygon is True:
+        n = 1
+    elif polygon is False:
+        n = 0
+    else:
+        n = random.randint(0, 1)
+
+    if sides == 3:
+        parabola_line = [["--", "--", "parabola"], ["--", "--", "--"]][n]
+    else:
+        if curves == 3:
+            parabola = ["parabola", 'parabola', "parabola"]
+        elif curves == 1:
+            parabola = ["--", '--', "parabola"]
+        else:
+            parabola = ["parabola", '--', "parabola"]
+        parabola_line = [parabola, ["--", "--", "--"]][n]
+        shuffle(parabola_line)
+
+    x = []
+    while len(x) < 3:
+        triangle = [[3, 2, 1], [1, 2, 3], [1, 1, 1], [2, 2, 2], [3, 3, 3]]
+        if sides == 3:
+            x = random.choice(triangle)
+        else:
+            x_1 = random.randint(1, width)
+            x_2 = random.randint(1, width)
+            if x_2 == 1:
+                x_3 = 1
+            else:
+                x_3 = random.randint(1, 3)
+            my_list = [x_1, x_2, x_3]
+            if my_list not in triangle:
+                x = my_list
+    flip = random.choices(["-", ""], k=2)
+    shape = r"""\begin{tikzpicture} 
+    \draw (0,0) -- (%s%s,0) %s (%s%s,%s1) %s (%s%s,%s2) %s (0,0); 
+    \end{tikzpicture}
+    """ % (flip[0], x[0],parabola_line[0],
+           flip[0], x[1], flip[1], parabola_line[1],
+           flip[0], x[2], flip[1], parabola_line[2])
+    return shape
