@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-from random import shuffle
+import random
 from string import ascii_uppercase
 
 
@@ -34,7 +34,7 @@ def multiple_choice(question: str, choices: list[str], correct: str,
         layout = 'onepar'
     choices_list = []
     if reorder:
-        shuffle(choices)
+        random.shuffle(choices)
     letter = ascii_uppercase[choices.index(correct)]
     for choice in choices:
         choices_list.append(f'\\choice {choice}\n')
@@ -132,6 +132,9 @@ def round_sig(a, k=1):
 
 
 def frac_simplify(a, b):
+    if b < 0:
+        a = - a
+        b = - b
     return a // gcd(a, b), b // gcd(a, b)
 
 
@@ -140,7 +143,11 @@ def latex_frac(a, b):
 
 
 def latex_frac_simplify(a, b):
-    return latex_frac(*frac_simplify(a, b))
+    m, n = frac_simplify(a, b)
+    if n == 1:
+        return str(m)
+    else:
+        return latex_frac(m, n)
 
 
 def fraction_addition(a, b, c, d):
@@ -472,7 +479,6 @@ def draw_random_shape(polygon, curves=2, sides=4):
         raise NameError(f"Sides must be either {my_list}")
     sides = sides
 
-
     if polygon is True:
         n = 1
     elif polygon is False:
@@ -490,7 +496,7 @@ def draw_random_shape(polygon, curves=2, sides=4):
         else:
             parabola = ["parabola", '--', "parabola"]
         parabola_line = [parabola, ["--", "--", "--"]][n]
-        shuffle(parabola_line)
+        random.shuffle(parabola_line)
 
     x = []
     while len(x) < 3:
@@ -508,12 +514,13 @@ def draw_random_shape(polygon, curves=2, sides=4):
             if my_list not in triangle:
                 x = my_list
     flip = random.choices(["-", ""], k=2)
-    shape = r"""\begin{tikzpicture} 
-    \draw (0,0) -- (%s%s,0) %s (%s%s,%s1) %s (%s%s,%s2) %s (0,0); 
-    \end{tikzpicture}
-    """ % (flip[0], x[0],parabola_line[0],
-           flip[0], x[1], flip[1], parabola_line[1],
-           flip[0], x[2], flip[1], parabola_line[2])
+    shape = r"""
+            \begin{tikzpicture} 
+            \draw (0,0) -- (%s%s,0) %s (%s%s,%s1) %s (%s%s,%s2) %s (0,0); 
+            \end{tikzpicture}
+            """ % (flip[0], x[0], parabola_line[0],
+                   flip[0], x[1], flip[1], parabola_line[1],
+                   flip[0], x[2], flip[1], parabola_line[2])
     return shape
 
 
@@ -595,7 +602,7 @@ def bar_chart(data: list, horizontal=False, fill='blue', size=(5, 5), label='',
     else:
         additional_axis = ''
 
-    drawing = r"""
+    bar_chart = r"""
         \begin{tikzpicture}
         \begin{axis} [%sbar, %s bar width=%fpt, height=%fcm, width=%fcm,
                       %slabel=%s %s]
@@ -603,7 +610,6 @@ def bar_chart(data: list, horizontal=False, fill='blue', size=(5, 5), label='',
         %s
         \end{axis}
         \end{tikzpicture}
-        """ % (x_or_y[n], sym_coord, bar_width, height,
-               width, x_or_y[n], label, additional_axis,
-               x_or_y[n], fill, coordinates, additional)
-    return drawing
+        """ % (x_or_y[n], sym_coord, bar_width, height, width, x_or_y[n],
+               label, additional_axis, x_or_y[n], fill, coordinates, additional)
+    return bar_chart
