@@ -166,14 +166,19 @@ def sqrt_simplify(n):
             n //= i * i
         else:
             i = i + 1
-    if n == 0:
+    return a, n
+
+
+def latex_sqrt_simplify(n):
+    a, b = sqrt_simplify(n)
+    if b == 0:
         return '$0$'
-    elif n == 1:
+    elif b == 1:
         return f'${a}$'
     elif a == 1:
-        return f'$\\sqrt{{{n}}}$'
+        return f'$\\sqrt{{{b}}}$'
     else:
-        return f'${a}\\sqrt{{{n}}}$'
+        return f'${a}\\sqrt{{{b}}}$'
 
 
 def triangle_area(a, b, c):
