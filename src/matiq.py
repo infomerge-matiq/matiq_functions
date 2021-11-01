@@ -522,3 +522,97 @@ def draw_random_shape(polygon, curves=2, sides=4):
                    flip[0], x[1], flip[1], parabola_line[1],
                    flip[0], x[2], flip[1], parabola_line[2])
     return shape
+
+
+def draw_two_lines(size=2, rotate=0, perpendicular=False, parallel=False):
+    length = 3
+    x = []
+    y = []
+    if perpendicular is True and parallel is True:
+        raise NameError("Lines cannot be both perpendicular and parallel.")
+
+    x_0 = random.randint(0, 3)
+    if perpendicular is True:
+        y_0 = -random.randint(2, 4)
+        x = [x_0, x_0 + length, random.randint(x_0, x_0 + length)]
+        y = [y_0, y_0, random.randint(y_0 - length, y_0)]
+        x.append(x[2])
+        y.append(y[1] + length)
+    elif parallel is True:
+        y_0 = random.randint(1, 3)
+        x = [x_0, x_0 + length, random.randint(1, 3)]
+        y = [0, 0, y_0, y_0]
+        x.append(x[2] + length)
+    else:
+        y = [0, length, 0, length]
+        while len(x) < 4:
+            nums = random.choices([0, 1, 2, 3], k=4)
+            if nums[0] == nums[1] == nums[2] == nums[3]:
+                nums[0] = (nums[0] + 1) % 4
+            theta = []
+            for i in range(2):
+                opp = y[1 + 2 * i] - y[0 + 2 * i]
+                adj = nums[1 + 2 * i] - nums[0 + 2 * i]
+                h = sqrt(opp ** 2 + adj ** 2)
+                if nums[0 + 2 * i] == nums[1 + 2 * i]:
+                    theta.append(degrees(asin(opp / h)))
+                else:
+                    theta.append(degrees(atan(opp / adj)))
+            delta = 180 - abs(theta[0]) - abs(theta[1])
+            check_1 = [[1, 3, 3, 1], [0, 2, 2, 0]]
+            check_2 = [i for i in range(65, 115)] + [j for j in range(0, 9)] +\
+                      [k for k in range(70, 181)] + [37]
+            if round(abs(delta)) not in check_2 and nums not in check_1:
+                x = nums
+
+    x = [size*i/3 for i in x]
+    y = [size*j/3 for j in y]
+    lines = r'''
+    \draw[rotate=%s] (%s,%s) -- (%s,%s); 
+    \draw[rotate=%s] (%s,%s) -- (%s,%s);
+    ''' % (rotate, x[0], y[0], x[1], y[1], rotate, x[2], y[2], x[3], y[3])
+    return r'\begin{tikzpicture} %s \end{tikzpicture}' % lines
+
+
+def bar_chart(data: list, horizontal=False, fill='blue', size=(5, 5), label='',
+              sym_axis=True, bar_width=15, axis_adj='', axis_step='', additional=''):
+    coordinates = ''
+    tags = []
+    if horizontal is True:
+        n = 0
+    else:
+        n = 1
+    m = (n + 1) % 2
+    height, width = size[0], size[1]
+    for i in range(len(data)):
+        tags.append(str(data[i][0]))
+        coordinates += r' (%s,%s) ' % (data[i][m], data[i][n])
+    tags = ','.join(tags)
+    x_or_y = ["x", "y"]
+
+    if sym_axis is True:
+        sym_coord = r"symbolic %s coords={%s}, %stick=data," \
+                    % (x_or_y[m], tags, x_or_y[m])
+    else:
+        sym_coord = ""
+    if axis_adj != '':
+        additional_axis = r', %s' % axis_adj
+    else:
+        additional_axis = ''
+    if axis_step != '':
+        increments = r"%stick={0,%s,...,%s*100}," % (x_or_y[n], axis_step, axis_step)
+    else:
+        increments = ''
+
+    chart = r"""
+        \begin{tikzpicture}
+        \begin{axis} [%sbar, %s bar width=%fpt, height=%fcm, width=%fcm, %s
+                      %slabel=%s %s]
+        \addplot[%sbar, fill=%s] coordinates { %s };
+        %s
+        \end{axis}
+        \end{tikzpicture}
+        """ % (x_or_y[n], sym_coord, bar_width, height, width,
+               increments, x_or_y[n], label, additional_axis,
+               x_or_y[n], fill, coordinates, additional)
+    return chart
