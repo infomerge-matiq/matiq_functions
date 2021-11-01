@@ -575,7 +575,7 @@ def draw_two_lines(size=2, rotate=0, perpendicular=False, parallel=False):
 
 
 def bar_chart(data: list, horizontal=False, fill='blue', size=(5, 5), label='',
-              sym_axis=True, bar_width=15, axis_adj='', additional=''):
+              sym_axis=True, bar_width=15, axis_adj='', axis_step='', additional=''):
     coordinates = ''
     tags = []
     if horizontal is True:
@@ -586,10 +586,8 @@ def bar_chart(data: list, horizontal=False, fill='blue', size=(5, 5), label='',
     height, width = size[0], size[1]
     for i in range(len(data)):
         tags.append(str(data[i][0]))
-        coordinates += r' (%s, %s) ' % (data[i][m], data[i][n])
+        coordinates += r' (%s,%s) ' % (data[i][m], data[i][n])
     tags = ','.join(tags)
-
-
     x_or_y = ["x", "y"]
 
     if sym_axis is True:
@@ -601,15 +599,20 @@ def bar_chart(data: list, horizontal=False, fill='blue', size=(5, 5), label='',
         additional_axis = r', %s' % axis_adj
     else:
         additional_axis = ''
+    if axis_step != '':
+        increments = r"%stick={0,%s,...,%s*100}," % (x_or_y[n], axis_step, axis_step)
+    else:
+        increments = ''
 
     bar_chart = r"""
         \begin{tikzpicture}
-        \begin{axis} [%sbar, %s bar width=%fpt, height=%fcm, width=%fcm,
+        \begin{axis} [%sbar, %s bar width=%fpt, height=%fcm, width=%fcm, %s
                       %slabel=%s %s]
         \addplot[%sbar, fill=%s] coordinates { %s };
         %s
         \end{axis}
         \end{tikzpicture}
-        """ % (x_or_y[n], sym_coord, bar_width, height, width, x_or_y[n],
-               label, additional_axis, x_or_y[n], fill, coordinates, additional)
+        """ % (x_or_y[n], sym_coord, bar_width, height, width,
+               increments, x_or_y[n], label, additional_axis,
+               x_or_y[n], fill, coordinates, additional)
     return bar_chart
