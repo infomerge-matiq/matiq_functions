@@ -604,7 +604,7 @@ def bar_chart(data: list, horizontal=False, fill='blue', size=(5, 5), label='',
     else:
         increments = ''
 
-    bar_chart = r"""
+    chart = r"""
         \begin{tikzpicture}
         \begin{axis} [%sbar, %s bar width=%fpt, height=%fcm, width=%fcm, %s
                       %slabel=%s %s]
@@ -615,4 +615,4 @@ def bar_chart(data: list, horizontal=False, fill='blue', size=(5, 5), label='',
         """ % (x_or_y[n], sym_coord, bar_width, height, width,
                increments, x_or_y[n], label, additional_axis,
                x_or_y[n], fill, coordinates, additional)
-    return bar_chart
+    return chart
