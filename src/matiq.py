@@ -645,4 +645,3 @@ def draw_tally(num, colour='black'):
                             % non_int)
     drawing = r' \ '.join(drawing_list)
     return drawing
-#
