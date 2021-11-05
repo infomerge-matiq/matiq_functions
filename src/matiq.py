@@ -616,3 +616,32 @@ def bar_chart(data: list, horizontal=False, fill='blue', size=(5, 5), label='',
                increments, x_or_y[n], label, additional_axis,
                x_or_y[n], fill, coordinates, additional)
     return chart
+
+
+def draw_tally(num, colour='black'):
+    thickness = 0.4
+    lines = [
+        r'\draw[line width=%smm, %s ] (0,0) -- (0,1em);'
+        % (thickness, colour),
+        r'\draw[line width=%smm, %s ] (0.1,0) -- (0.1,1em);'
+        % (thickness, colour),
+        r'\draw[line width=%smm, %s ] (0.2,0) -- (0.2,1em);'
+        % (thickness, colour),
+        r'\draw[line width=%smm, %s ] (0.3,0) -- (0.3,1em);'
+        % (thickness, colour),
+        r'\draw[line width=%smm, %s ] (0.3,0) -- (0,1em);'
+        % (thickness, colour)
+    ]
+    draw_integer = ' '.join(lines)
+    a = floor(num/5)
+    drawing_list = []
+    for i in range(a):
+        drawing_list.append(r'\begin{tikzpicture} %s \end{tikzpicture}'
+                            % draw_integer)
+    b = num % 5
+    if b > 0:
+        non_int = ''.join(lines[0:b])
+        drawing_list.append(r'\begin{tikzpicture} %s \end{tikzpicture}'
+                            % non_int)
+    drawing = r' \ '.join(drawing_list)
+    return drawing
