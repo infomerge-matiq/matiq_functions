@@ -367,8 +367,12 @@ def draw_angle(x_angle, y_angle=0, radius=4, shaded_radius=1):
     return model
 
 
-def draw_table(data: list):
+def draw_table(data: list, centered=True):
     num_columns = len(data[0])
+    if centered is False:
+        columns = ' | '.join('l' * num_columns)
+    else:
+        columns = ' | '.join('c' * num_columns)
     for row in data:
         if len(row) != num_columns:
             raise ValueError("Rows are not of fixed length.")
@@ -378,7 +382,7 @@ def draw_table(data: list):
             \hline
             %s \\ [0.5ex]
             \hline
-    ''' % (' | '.join('c' * num_columns), ' & '.join(data[0]))
+    ''' % (columns, ' & '.join(data[0]))
     for row in data[1:]:
         row_tex = r'''
                   %s \\
@@ -645,3 +649,186 @@ def draw_tally(num, colour='black'):
                             % non_int)
     drawing = r' \ '.join(drawing_list)
     return drawing
+
+def draw_line_graph(data:list, sym_axis=True, x_label='', y_label='',
+                    scale=0.7, legend='', axis_adj='', colour='blue',
+                    grid=True, additional='', title=''):
+
+    scale = scale
+    x_label = x_label
+    y_label = y_label
+
+    coordinates = ''
+    x_coord = []
+
+    for i in range(len(data)):
+        x_coord.append(str(data[i][0]))
+        coordinates += r' (%s,%s) ' % (data[i][0], data[i][1])
+    x_coord = ','.join(x_coord)
+
+    if legend == '':
+        legend_text = ''
+    else:
+        legend_text = r'\legend{%s}' % legend
+    if sym_axis is True:
+        sym_x_coord = r'symbolic x coords={%s},' % (x_coord)
+    else:
+        sym_x_coord = ''
+    if axis_adj != '':
+        additional_axis = r',%s' % axis_adj
+    else:
+        additional_axis = ''
+    if grid is True:
+        grid_lines = r'true'
+    else:
+        grid_lines = r'false'
+
+    model = r'''
+    \begin{tikzpicture}
+    \begin{axis}[ scale = %s,
+    xlabel = %s, 
+    ylabel = %s,
+    width = 10cm, height = 7cm,
+    %s xtick=data, ymajorgrids=%s, title = %s,
+    legend style = {at = {(0.0, .91)}, anchor = west}%s]
+    \addplot[color = %s, mark = *] coordinates
+    {
+    %s
+    };
+    %s
+    %s
+    \end{axis}
+    \end{tikzpicture}
+    ''' % (scale, x_label, y_label, sym_x_coord, grid_lines, title,
+           additional_axis, colour, coordinates, additional, legend_text)
+    return model
+
+
+def draw_thermometer(temperature, scale=0.9, text_size="small",
+                     show_Celsius = True, show_Fahrenheit=False,
+                     half_increments=False, horizontal=True,
+                     length=1, width=1):
+
+    fill_temp = temperature
+    font_size = r"\%s" % text_size if text_size[0:1] != "\\" else text_size
+
+    if show_Celsius is True and show_Fahrenheit is True:
+        label = ["Celsius", "Fahrenheit"]
+    else:
+        label = ["", ""]
+
+    if horizontal is True:
+        rotate_text, rotate_label, rotate = 300, 0, 90
+        x_or_y = "x"
+        scale_length = r"xscale=%s" % length
+        scale_width = r"yscale=-%s" % width
+    else:
+        rotate_text, rotate_label, rotate = 0, 0, 0
+        x_or_y = "y"
+        scale_length = r"yscale=-%s" % length
+        scale_width = r"xscale=%s" % width
+
+    model = r"""
+    \begin{tikzpicture}[y=0.5pt, x=0.5pt, %s, %s,
+                        inner sep=0pt, outer sep=0pt, scale=%s, rotate=%s]
+    \def\thermopath{
+      (280.0313,169.3125) .. 
+      controls (263.9888,169.3125) and (250.6461,179.3446) ..
+      (247.8125,192.5625) -- 
+      (247.3438,563.7500) .. 
+      controls (235.7346,573.2243) and (228.3438,587.6282) ..
+      (228.3438,603.7813) .. 
+      controls (228.3438,632.3161) and (251.4651,655.4688) ..
+      (280.0000,655.4688) .. 
+      controls (308.5349,655.4688) and (331.6563,632.3161) ..
+      (331.6563,603.7813) .. 
+      controls (331.6563,587.6282) and (324.2654,573.2243) ..
+      (312.6563,563.7500) -- 
+      (312.2500,192.5625) .. 
+      controls (309.4164,179.3446) and (296.0737,169.3125) .. 
+      (280.0313,169.3125) -- cycle
+     }
+    \path[miter limit=4,even odd rule,fill=gray!20]
+        \thermopath;
+    """ % (scale_length, scale_width, scale, rotate)
+
+    model += r"""
+    \def\tempincelsius{%s}
+    \begin{scope}
+        \clip \thermopath;
+        \fill[red] (210,{560- 3.7*\tempincelsius}) -- ++(140,0)
+            -- (350, 690) -- (210, 690) -- cycle;
+    \end{scope}
+    """ % fill_temp
+
+    model += r"""
+    \path[draw=black,miter limit=4,even odd rule,line width=2.5pt]
+        \thermopath;"""
+    if show_Celsius is True:
+        model += r"""
+        \foreach \y/\x in {190/100,
+                           227/90,
+                           264/80,
+                           301/70,
+                           338/60,
+                           375/50,
+                           412/40,
+                           449/30,
+                           486/20,
+                           523/10,
+                           560/0%
+                           }"""
+        model += r"""
+            {\draw (222,\y)--(198,\y) node[left, font=%s, rotate=%s](\x)
+            {\x\textdegree C~};}""" % (font_size, rotate_text)
+    if show_Celsius is True and half_increments is True:
+        model += r"""
+        \foreach \y in {208.5,
+                        245.5,
+                        282.5,
+                        319.5,
+                        356.5,
+                        393.5,
+                        430.5,
+                        467.5,
+                        504.5,
+                        541.5}"""
+        model += r"""{\draw (217,\y)--(203,\y);}"""
+    if show_Fahrenheit is True:
+        model += r"""
+    \foreach \u/\v in {189.999/212,
+                       231.111/192,
+                       272.222/172,
+                       313.333/152,
+                       354.444/132,
+                       395.555/112,
+                       436.666/92,
+                       477.777/72,
+                       518.888/52,
+                       559.999/32%
+                       }"""
+        model += r"""
+        {\draw (338,\u)--(362,\u) node[right, font=%s, rotate=%s](\v)
+        {\v\textdegree F};}""" % (font_size, rotate_text)
+    if show_Fahrenheit is True and half_increments is True:
+        model += r"""
+        \foreach \u in {231.111,
+                        272.222,
+                        313.333,
+                        354.444,
+                        395.555,
+                        436.666,
+                        477.777,
+                        518.888,
+                        559.999}"""
+        model += r"""{\draw (343,\u - 41.111/2)--(357,\u - 41.111/2);}"""
+    if show_Celsius is True:
+        model += r"""
+        \draw (210,190)node[%sshift=4ex, red, font=%s, rotate=%s] {%s} 
+        --(210,560) ;""" % (x_or_y,font_size, rotate_label, label[0])
+    if show_Fahrenheit is True:
+        model += r"""
+        \draw (350,190)node[%sshift=4ex, blue, font=%s, rotate=%s] {%s}
+        --(350,560);""" % (x_or_y,font_size, rotate_label, label[1])
+    model += r"\end{tikzpicture}"
+    return model
