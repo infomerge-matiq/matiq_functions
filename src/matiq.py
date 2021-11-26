@@ -23,6 +23,7 @@ SOFTWARE.
 """
 import random
 from string import ascii_uppercase
+from math import sqrt, degrees, asin, atan, floor
 
 
 def multiple_choice(question: str, choices: list[str], correct: str,
@@ -530,8 +531,6 @@ def draw_random_shape(polygon, curves=2, sides=4):
 
 def draw_two_lines(size=2, rotate=0, perpendicular=False, parallel=False):
     length = 3
-    x = []
-    y = []
     if perpendicular is True and parallel is True:
         raise NameError("Lines cannot be both perpendicular and parallel.")
 
@@ -548,6 +547,7 @@ def draw_two_lines(size=2, rotate=0, perpendicular=False, parallel=False):
         y = [0, 0, y_0, y_0]
         x.append(x[2] + length)
     else:
+        x = []
         y = [0, length, 0, length]
         while len(x) < 4:
             nums = random.choices([0, 1, 2, 3], k=4)
@@ -564,13 +564,15 @@ def draw_two_lines(size=2, rotate=0, perpendicular=False, parallel=False):
                     theta.append(degrees(atan(opp / adj)))
             delta = 180 - abs(theta[0]) - abs(theta[1])
             check_1 = [[1, 3, 3, 1], [0, 2, 2, 0]]
-            check_2 = [i for i in range(65, 115)] + [j for j in range(0, 9)] +\
-                      [k for k in range(70, 181)] + [37]
+            check_2 = ([i for i in range(65, 115)]
+                       + [j for j in range(0, 9)]
+                       + [k for k in range(70, 181)]
+                       + [37])
             if round(abs(delta)) not in check_2 and nums not in check_1:
                 x = nums
 
-    x = [size*i/3 for i in x]
-    y = [size*j/3 for j in y]
+    x = [size * i / 3 for i in x]
+    y = [size * j / 3 for j in y]
     lines = r'''
     \draw[rotate=%s] (%s,%s) -- (%s,%s); 
     \draw[rotate=%s] (%s,%s) -- (%s,%s);
@@ -579,7 +581,8 @@ def draw_two_lines(size=2, rotate=0, perpendicular=False, parallel=False):
 
 
 def bar_chart(data: list, horizontal=False, fill='blue', size=(5, 5), label='',
-              sym_axis=True, bar_width=15, axis_adj='', axis_step='', additional=''):
+              sym_axis=True, bar_width=15, axis_adj='', axis_step='',
+              additional=''):
     coordinates = ''
     tags = []
     if horizontal is True:
@@ -604,7 +607,9 @@ def bar_chart(data: list, horizontal=False, fill='blue', size=(5, 5), label='',
     else:
         additional_axis = ''
     if axis_step != '':
-        increments = r"%stick={0,%s,...,%s*100}," % (x_or_y[n], axis_step, axis_step)
+        increments = r"%stick={0, %s,..., %s * 100}," % (x_or_y[n],
+                                                         axis_step,
+                                                         axis_step)
     else:
         increments = ''
 
@@ -650,7 +655,8 @@ def draw_tally(num, colour='black'):
     drawing = r' \ '.join(drawing_list)
     return drawing
 
-def draw_line_graph(data:list, sym_axis=True, x_label='', y_label='',
+
+def draw_line_graph(data: list, sym_axis=True, x_label='', y_label='',
                     scale=0.7, legend='', axis_adj='', colour='blue',
                     grid=True, additional='', title=''):
 
@@ -671,7 +677,7 @@ def draw_line_graph(data:list, sym_axis=True, x_label='', y_label='',
     else:
         legend_text = r'\legend{%s}' % legend
     if sym_axis is True:
-        sym_x_coord = r'symbolic x coords={%s},' % (x_coord)
+        sym_x_coord = r'symbolic x coords={%s},' % x_coord
     else:
         sym_x_coord = ''
     if axis_adj != '':
@@ -705,14 +711,14 @@ def draw_line_graph(data:list, sym_axis=True, x_label='', y_label='',
 
 
 def draw_thermometer(temperature, scale=0.9, text_size="small",
-                     show_Celsius = True, show_Fahrenheit=False,
+                     show_celsius=True, show_fahrenheit=False,
                      half_increments=False, horizontal=True,
                      length=1, width=1):
 
     fill_temp = temperature
     font_size = r"\%s" % text_size if text_size[0:1] != "\\" else text_size
 
-    if show_Celsius is True and show_Fahrenheit is True:
+    if show_celsius is True and show_fahrenheit is True:
         label = ["Celsius", "Fahrenheit"]
     else:
         label = ["", ""]
@@ -764,7 +770,7 @@ def draw_thermometer(temperature, scale=0.9, text_size="small",
     model += r"""
     \path[draw=black,miter limit=4,even odd rule,line width=2.5pt]
         \thermopath;"""
-    if show_Celsius is True:
+    if show_celsius is True:
         model += r"""
         \foreach \y/\x in {190/100,
                            227/90,
@@ -781,7 +787,7 @@ def draw_thermometer(temperature, scale=0.9, text_size="small",
         model += r"""
             {\draw (222,\y)--(198,\y) node[left, font=%s, rotate=%s](\x)
             {\x\textdegree C~};}""" % (font_size, rotate_text)
-    if show_Celsius is True and half_increments is True:
+    if show_celsius is True and half_increments is True:
         model += r"""
         \foreach \y in {208.5,
                         245.5,
@@ -794,7 +800,7 @@ def draw_thermometer(temperature, scale=0.9, text_size="small",
                         504.5,
                         541.5}"""
         model += r"""{\draw (217,\y)--(203,\y);}"""
-    if show_Fahrenheit is True:
+    if show_fahrenheit is True:
         model += r"""
     \foreach \u/\v in {189.999/212,
                        231.111/192,
@@ -810,7 +816,7 @@ def draw_thermometer(temperature, scale=0.9, text_size="small",
         model += r"""
         {\draw (338,\u)--(362,\u) node[right, font=%s, rotate=%s](\v)
         {\v\textdegree F};}""" % (font_size, rotate_text)
-    if show_Fahrenheit is True and half_increments is True:
+    if show_fahrenheit is True and half_increments is True:
         model += r"""
         \foreach \u in {231.111,
                         272.222,
@@ -822,13 +828,13 @@ def draw_thermometer(temperature, scale=0.9, text_size="small",
                         518.888,
                         559.999}"""
         model += r"""{\draw (343,\u - 41.111/2)--(357,\u - 41.111/2);}"""
-    if show_Celsius is True:
+    if show_celsius is True:
         model += r"""
         \draw (210,190)node[%sshift=4ex, red, font=%s, rotate=%s] {%s} 
-        --(210,560) ;""" % (x_or_y,font_size, rotate_label, label[0])
-    if show_Fahrenheit is True:
+        --(210,560) ;""" % (x_or_y, font_size, rotate_label, label[0])
+    if show_fahrenheit is True:
         model += r"""
         \draw (350,190)node[%sshift=4ex, blue, font=%s, rotate=%s] {%s}
-        --(350,560);""" % (x_or_y,font_size, rotate_label, label[1])
+        --(350,560);""" % (x_or_y, font_size, rotate_label, label[1])
     model += r"\end{tikzpicture}"
     return model
