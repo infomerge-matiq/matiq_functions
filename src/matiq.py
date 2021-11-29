@@ -838,3 +838,24 @@ def draw_thermometer(temperature, scale=0.9, text_size="small",
         --(350,560);""" % (x_or_y, font_size, rotate_label, label[1])
     model += r"\end{tikzpicture}"
     return model
+
+
+def random_place_symbols(n, text_size="Large"):
+    names = ["Coffee Shop", "Post Office", "Barbers", "Bank", "Bicycle Shop",
+             "Football Stadium", "Florist", "Airport", "Hospital"]
+    latex_commands = [r"\textcolor{brown!80!black}{\textbf{\Coffeecup}}",
+                      r"\textcolor{blue!30!darkgray}{\Letter}",
+                      r"\textcolor{red!85!black}{\LeftScissors}",
+                      r"\textcolor{green!80!black}{\textbf{\textsterling}}",
+                      r"\textcolor{blue!65!lightgray}{\textbf{\Bicycle}}",
+                      r"\Football",
+                      r"\textcolor{green!70!black}{\textbf{\FiveFlowerOpen}}",
+                      "\\Plane",
+                      r"\textcolor{red}{\textbf{\Plus}}"]
+    if n == 0 or n > len(names):
+        raise IndexError(f"Number of Symbols must be "
+                         f"between 1 and {len(names)}")
+    k = random.sample(range(0, len(names)), k=n)
+    symbol_list = [
+        [names[i], r"{\%s %s}" % (text_size, latex_commands[i])] for i in k]
+    return symbol_list
