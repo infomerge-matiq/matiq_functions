@@ -942,4 +942,3 @@ def venn_diagram(set_a: list, set_b: list, intersect: list,
     \end{tikzpicture}""" % (scale, labels[0], labels[1], scale,
                             scale, text_a, text_b, text_a_n_b)
     return diagram
-
