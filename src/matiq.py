@@ -432,13 +432,14 @@ def draw_semi_circle(radius=1.5):
     return shape
 
 
-def draw_regular_polygon(sides, size=2):
+def draw_regular_polygon(sides, size=2, colour=""):
+    fill = '=%s, fill=%s' % (colour, colour) if colour != "" else ''
     shape = r'''
             \begin{tikzpicture} 
             \node[regular polygon, regular polygon sides=%s, minimum size=%scm, 
-            draw] at (0, 0) {};
+            draw%s] at (0, 0) {};
             \end{tikzpicture}
-            ''' % (sides, size)
+            ''' % (sides, size, fill)
     return shape
 
 
@@ -859,3 +860,86 @@ def random_place_symbols(n, text_size="Large"):
     symbol_list = [
         [names[i], r"{\%s %s}" % (text_size, latex_commands[i])] for i in k]
     return symbol_list
+
+
+def venn_diagram(set_a: list, set_b: list, intersect: list,
+                 labels=None, scale=1):
+    if set_a is not None and set_a != "":
+        if len(set_a) > 9:
+            raise TypeError("Maximum number of data entries in "
+                            "set_a or set_b is 9.")
+    if set_b is not None and set_b != "":
+        if len(set_b) > 9:
+            raise TypeError("Maximum number of data entries in "
+                            "set_a or set_b is 9.")
+    if intersect is not None and intersect != "":
+        if len(intersect) > 5:
+            raise TypeError("Maximum number of entries in intersect is 5.")
+    set_a, set_b, a_n_b = set_a, set_b, intersect
+    circle = r'''\phantom{\tikz \node[circle, text opacity=0, minimum size=1em, 
+                 draw=white,fill=white] (c) {};}'''
+    if set_a is not None and set_a != "":
+        if 0 < len(set_a) < 9:
+            for i in range(9 - len(set_a)):
+                set_a.append(circle)
+        random.shuffle(set_a)
+    if set_b is not None and set_b != "":
+        if 0< len(set_b) < 9:
+            for i in range(9 - len(set_b)):
+                set_b.append(circle)
+        random.shuffle(set_b)
+    if a_n_b != None and a_n_b != "":
+        if 0 < len(a_n_b) < 5:
+            for i in range(5 - len(a_n_b)):
+                a_n_b.append(circle)
+        random.shuffle(a_n_b)
+
+    a = []
+    b = []
+    if set_a is not None and set_a != "":
+        for i in range(0, 9, 3):
+            row_1 = ' & '.join(set_a[i:i+3])
+            a.append(row_1)
+        a = r' \\ '.join(a)
+    else:
+        a = ""
+    if set_b is not None and set_b != "":
+        for i in range(0, 9, 3):
+            row_2 = ' & '.join(set_b[i:i+3])
+            b.append(row_2)
+        b = r' \\ '.join(b)
+    else:
+        b = ""
+
+    text_a = r'{\arraycolsep=2pt$\begin{array}{ccc} %s \end{array}$}' % a
+    text_b = r'{\arraycolsep=2pt$\begin{array}{ccc} %s \end{array}$}' % b
+    if a_n_b is not None and a_n_b != "":
+        a_b = ' & '.join(a_n_b[1:4])
+        text_a_n_b = r'''{\arraycolsep=2pt$\begin{array}{lll} 
+        & %s & \\ %s \\ & %s & \end{array}$}''' % (a_n_b[0], a_b, a_n_b[4])
+    else:
+        text_a_n_b = ""
+
+    if labels is None:
+        labels = ["Set A", "Set B"]
+    if len(labels) > 2:
+        raise TypeError("Two or less data entries in labels are permitted")
+    diagram = r"""
+    \begin{tikzpicture}[thick,
+        set/.style = {ellipse, minimum height=4cm, 
+                      minimum width=4.7cm, scale=%s}]
+    \node[set,fill=white,label={93:%s}] (A) at (0,0) {};
+    \node[set,fill=white,label={87:%s}] (B) at (2.7,0) {};
+
+    \draw (0,0) 
+    node[ellipse, minimum height=4cm, minimum width=4.7cm,draw, scale=%s] {};
+    \draw (2.7,0) 
+    node[ellipse, minimum height=4cm, minimum width=4.7cm,draw, scale=%s] {};
+
+    \node[left,black, xshift=1.2ex] at (A.center) {%s};
+    \node[right, black, xshift=-1.2ex] at (B.center) {%s};
+    \node at (1.35,0)  {%s};
+    \end{tikzpicture}""" % (scale, labels[0], labels[1], scale,
+                            scale, text_a, text_b, text_a_n_b)
+    return diagram
+
