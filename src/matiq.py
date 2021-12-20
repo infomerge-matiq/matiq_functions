@@ -520,11 +520,11 @@ def draw_random_shape(polygon, curves=2, sides=4):
             if my_list not in triangle:
                 x = my_list
     flip = random.choices(["-", ""], k=2)
-    shape = r"""
+    shape = r'''
             \begin{tikzpicture} 
             \draw (0,0) -- (%s%s,0) %s (%s%s,%s1) %s (%s%s,%s2) %s (0,0); 
             \end{tikzpicture}
-            """ % (flip[0], x[0], parabola_line[0],
+            ''' % (flip[0], x[0], parabola_line[0],
                    flip[0], x[1], flip[1], parabola_line[1],
                    flip[0], x[2], flip[1], parabola_line[2])
     return shape
@@ -614,7 +614,7 @@ def bar_chart(data: list, horizontal=False, fill='blue', size=(5, 5), label='',
     else:
         increments = ''
 
-    chart = r"""
+    chart = r'''
         \begin{tikzpicture}
         \begin{axis} [%sbar, %s bar width=%fpt, height=%fcm, width=%fcm, %s
                       %slabel=%s %s]
@@ -622,7 +622,7 @@ def bar_chart(data: list, horizontal=False, fill='blue', size=(5, 5), label='',
         %s
         \end{axis}
         \end{tikzpicture}
-        """ % (x_or_y[n], sym_coord, bar_width, height, width,
+        ''' % (x_or_y[n], sym_coord, bar_width, height, width,
                increments, x_or_y[n], label, additional_axis,
                x_or_y[n], fill, coordinates, additional)
     return chart
@@ -643,7 +643,7 @@ def draw_tally(num, colour='black'):
         % (thickness, colour)
     ]
     draw_integer = ' '.join(lines)
-    a = floor(num/5)
+    a = floor(num / 5)
     drawing_list = []
     for i in range(a):
         drawing_list.append(r'\begin{tikzpicture} %s \end{tikzpicture}'
@@ -660,7 +660,6 @@ def draw_tally(num, colour='black'):
 def draw_line_graph(data: list, sym_axis=True, x_label='', y_label='',
                     scale=0.7, legend='', axis_adj='', colour='blue',
                     grid=True, additional='', title=''):
-
     scale = scale
     x_label = x_label
     y_label = y_label
@@ -715,7 +714,6 @@ def draw_thermometer(temperature, scale=0.9, text_size="small",
                      show_celsius=True, show_fahrenheit=False,
                      half_increments=False, horizontal=True,
                      length=1, width=1):
-
     fill_temp = temperature
     font_size = r"\%s" % text_size if text_size[0:1] != "\\" else text_size
 
@@ -735,7 +733,7 @@ def draw_thermometer(temperature, scale=0.9, text_size="small",
         scale_length = r"yscale=-%s" % length
         scale_width = r"xscale=%s" % width
 
-    model = r"""
+    model = r'''
     \begin{tikzpicture}[y=0.5pt, x=0.5pt, %s, %s,
                         inner sep=0pt, outer sep=0pt, scale=%s, rotate=%s]
     \def\thermopath{
@@ -757,22 +755,22 @@ def draw_thermometer(temperature, scale=0.9, text_size="small",
      }
     \path[miter limit=4,even odd rule,fill=gray!20]
         \thermopath;
-    """ % (scale_length, scale_width, scale, rotate)
+    ''' % (scale_length, scale_width, scale, rotate)
 
-    model += r"""
+    model += r'''
     \def\tempincelsius{%s}
     \begin{scope}
         \clip \thermopath;
         \fill[red] (210,{560- 3.7*\tempincelsius}) -- ++(140,0)
             -- (350, 690) -- (210, 690) -- cycle;
     \end{scope}
-    """ % fill_temp
+    ''' % fill_temp
 
-    model += r"""
+    model += r'''
     \path[draw=black,miter limit=4,even odd rule,line width=2.5pt]
-        \thermopath;"""
+        \thermopath;'''
     if show_celsius is True:
-        model += r"""
+        model += r'''
         \foreach \y/\x in {190/100,
                            227/90,
                            264/80,
@@ -784,12 +782,12 @@ def draw_thermometer(temperature, scale=0.9, text_size="small",
                            486/20,
                            523/10,
                            560/0%
-                           }"""
-        model += r"""
+                           }'''
+        model += r'''
             {\draw (222,\y)--(198,\y) node[left, font=%s, rotate=%s](\x)
-            {\x\textdegree C~};}""" % (font_size, rotate_text)
+            {\x\textdegree C~};}''' % (font_size, rotate_text)
     if show_celsius is True and half_increments is True:
-        model += r"""
+        model += r'''
         \foreach \y in {208.5,
                         245.5,
                         282.5,
@@ -799,10 +797,10 @@ def draw_thermometer(temperature, scale=0.9, text_size="small",
                         430.5,
                         467.5,
                         504.5,
-                        541.5}"""
-        model += r"""{\draw (217,\y)--(203,\y);}"""
+                        541.5}'''
+        model += r'''{\draw (217,\y)--(203,\y);}'''
     if show_fahrenheit is True:
-        model += r"""
+        model += r'''
     \foreach \u/\v in {189.999/212,
                        231.111/192,
                        272.222/172,
@@ -813,12 +811,12 @@ def draw_thermometer(temperature, scale=0.9, text_size="small",
                        477.777/72,
                        518.888/52,
                        559.999/32%
-                       }"""
-        model += r"""
+                       }'''
+        model += r'''
         {\draw (338,\u)--(362,\u) node[right, font=%s, rotate=%s](\v)
-        {\v\textdegree F};}""" % (font_size, rotate_text)
+        {\v\textdegree F};}''' % (font_size, rotate_text)
     if show_fahrenheit is True and half_increments is True:
-        model += r"""
+        model += r'''
         \foreach \u in {231.111,
                         272.222,
                         313.333,
@@ -827,21 +825,21 @@ def draw_thermometer(temperature, scale=0.9, text_size="small",
                         436.666,
                         477.777,
                         518.888,
-                        559.999}"""
-        model += r"""{\draw (343,\u - 41.111/2)--(357,\u - 41.111/2);}"""
+                        559.999}'''
+        model += r'''{\draw (343,\u - 41.111/2)--(357,\u - 41.111/2);}'''
     if show_celsius is True:
-        model += r"""
+        model += r'''
         \draw (210,190)node[%sshift=4ex, red, font=%s, rotate=%s] {%s} 
-        --(210,560) ;""" % (x_or_y, font_size, rotate_label, label[0])
+        --(210,560) ;''' % (x_or_y, font_size, rotate_label, label[0])
     if show_fahrenheit is True:
-        model += r"""
+        model += r'''
         \draw (350,190)node[%sshift=4ex, blue, font=%s, rotate=%s] {%s}
-        --(350,560);""" % (x_or_y, font_size, rotate_label, label[1])
+        --(350,560);''' % (x_or_y, font_size, rotate_label, label[1])
     model += r"\end{tikzpicture}"
     return model
 
 
-def random_place_symbols(n, text_size="Large"):
+def random_place_symbols(n, text_size='Large'):
     names = ["Coffee Shop", "Post Office", "Barbers", "Bank", "Bicycle Shop",
              "Football Stadium", "Florist", "Airport", "Hospital"]
     latex_commands = [r"\textcolor{brown!80!black}{\textbf{\Coffeecup}}",
@@ -851,80 +849,43 @@ def random_place_symbols(n, text_size="Large"):
                       r"\textcolor{blue!65!lightgray}{\textbf{\Bicycle}}",
                       r"\Football",
                       r"\textcolor{green!70!black}{\textbf{\FiveFlowerOpen}}",
-                      "\\Plane",
+                      r"\Plane",
                       r"\textcolor{red}{\textbf{\Plus}}"]
-    if n == 0 or n > len(names):
-        raise IndexError(f"Number of Symbols must be "
-                         f"between 1 and {len(names)}")
     k = random.sample(range(0, len(names)), k=n)
     symbol_list = [
         [names[i], r"{\%s %s}" % (text_size, latex_commands[i])] for i in k]
     return symbol_list
 
 
-def venn_diagram(set_a: list, set_b: list, intersect: list,
-                 labels=None, scale=1):
-    if set_a is not None and set_a != "":
-        if len(set_a) > 9:
-            raise TypeError("Maximum number of data entries in "
-                            "set_a or set_b is 9.")
-    if set_b is not None and set_b != "":
-        if len(set_b) > 9:
-            raise TypeError("Maximum number of data entries in "
-                            "set_a or set_b is 9.")
-    if intersect is not None and intersect != "":
-        if len(intersect) > 5:
-            raise TypeError("Maximum number of entries in intersect is 5.")
-    set_a, set_b, a_n_b = set_a, set_b, intersect
+def venn_diagram(set_a: list, set_b: list, intersect: list, labels=None,
+                 scale=1):
+    if len(set_a) > 9 or len(set_b) > 9:
+        raise TypeError("Maximum number of data entries in "
+                        "set_a or set_b is 9.")
+    if len(intersect) > 5:
+        raise TypeError("Maximum number of entries in intersect is 5.")
+
     circle = r'''\phantom{\tikz \node[circle, text opacity=0, minimum size=1em, 
                  draw=white,fill=white] (c) {};}'''
-    if set_a is not None and set_a != "":
-        if 0 < len(set_a) < 9:
-            for i in range(9 - len(set_a)):
-                set_a.append(circle)
-        random.shuffle(set_a)
-    if set_b is not None and set_b != "":
-        if 0< len(set_b) < 9:
-            for i in range(9 - len(set_b)):
-                set_b.append(circle)
-        random.shuffle(set_b)
-    if a_n_b != None and a_n_b != "":
-        if 0 < len(a_n_b) < 5:
-            for i in range(5 - len(a_n_b)):
-                a_n_b.append(circle)
-        random.shuffle(a_n_b)
 
-    a = []
-    b = []
-    if set_a is not None and set_a != "":
-        for i in range(0, 9, 3):
-            row_1 = ' & '.join(set_a[i:i+3])
-            a.append(row_1)
-        a = r' \\ '.join(a)
-    else:
-        a = ""
-    if set_b is not None and set_b != "":
-        for i in range(0, 9, 3):
-            row_2 = ' & '.join(set_b[i:i+3])
-            b.append(row_2)
-        b = r' \\ '.join(b)
-    else:
-        b = ""
+    set_a += [circle] * (9 - len(set_a))
+    random.shuffle(set_a)
+    a = r' \\ '.join([' & '.join(set_a[i:i + 3]) for i in range(0, 9, 3)])
 
-    text_a = r'{\arraycolsep=2pt$\begin{array}{ccc} %s \end{array}$}' % a
-    text_b = r'{\arraycolsep=2pt$\begin{array}{ccc} %s \end{array}$}' % b
-    if a_n_b is not None and a_n_b != "":
-        a_b = ' & '.join(a_n_b[1:4])
-        text_a_n_b = r'''{\arraycolsep=2pt$\begin{array}{lll} 
-        & %s & \\ %s \\ & %s & \end{array}$}''' % (a_n_b[0], a_b, a_n_b[4])
-    else:
-        text_a_n_b = ""
+    set_b += [circle] * (9 - len(set_b))
+    random.shuffle(set_b)
+    b = r' \\ '.join([' & '.join(set_b[i:i + 3]) for i in range(0, 9, 3)])
+
+    intersect += [circle] * (5 - len(intersect))
+    random.shuffle(intersect)
+    text_intersect = r'''
+    {\arraycolsep=2pt$\begin{array}{lll} 
+    & %s & \\ %s \\ & %s & \end{array}$}
+    ''' % (intersect[0], ' & '.join(intersect[1:4]), intersect[4])
 
     if labels is None:
         labels = ["Set A", "Set B"]
-    if len(labels) > 2:
-        raise TypeError("Two or less data entries in labels are permitted")
-    diagram = r"""
+    diagram = r'''
     \begin{tikzpicture}[thick,
         set/.style = {ellipse, minimum height=4cm, 
                       minimum width=4.7cm, scale=%s}]
@@ -936,9 +897,9 @@ def venn_diagram(set_a: list, set_b: list, intersect: list,
     \draw (2.7,0) 
     node[ellipse, minimum height=4cm, minimum width=4.7cm,draw, scale=%s] {};
 
-    \node[left,black, xshift=1.2ex] at (A.center) {%s};
-    \node[right, black, xshift=-1.2ex] at (B.center) {%s};
+    \node[left,black, xshift=1.2ex] at (A.center) {{\arraycolsep=2pt$\begin{array}{ccc} %s \end{array}$}};
+    \node[right, black, xshift=-1.2ex] at (B.center) {{\arraycolsep=2pt$\begin{array}{ccc} %s \end{array}$}};
     \node at (1.35,0)  {%s};
-    \end{tikzpicture}""" % (scale, labels[0], labels[1], scale,
-                            scale, text_a, text_b, text_a_n_b)
+    \end{tikzpicture}
+    ''' % (scale, labels[0], labels[1], scale, scale, a, b, text_intersect)
     return diagram
