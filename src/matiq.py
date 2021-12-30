@@ -26,8 +26,8 @@ from string import ascii_uppercase
 from math import sqrt, degrees, asin, atan, floor
 
 
-def multiple_choice(question: str, choices: list[str], correct: str,
-                    onepar=True, reorder=True):
+def multiple_choice(question: str, choices: list, correct, onepar=True,
+                    reorder=True):
     """Takes question, choices(which contains answer), answer and returns
     a multiple choice question and the answer"""
     layout = ""
@@ -163,7 +163,7 @@ def fraction_subtraction(a, b, c, d):
     return frac_simplify(numerator, denominator)
 
 
-def sqrt_simplify(n):
+def sqrt_simplify(n: int):
     if n < 0:
         raise ValueError
     i = 2
