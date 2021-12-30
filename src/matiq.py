@@ -903,3 +903,171 @@ def venn_diagram(set_a: list, set_b: list, intersect: list, labels=None,
     \end{tikzpicture}
     ''' % (scale, labels[0], labels[1], scale, scale, a, b, text_intersect)
     return diagram
+
+
+def draw_rectilinear_shape(row_lengths: list, colour, center=False):
+    square = draw_square(size=1, draw='black', fill=colour)
+    max_per_row = max(row_lengths)
+    l_r = random.choice(['r', 'l']) * max_per_row
+    rows = []
+    for i in row_lengths:
+        row = [square * i]
+        if len(row) < max_per_row:
+            phantom = [(max_per_row - len(row)) * (r'\phantom{%s}' % square)]
+            row = row + phantom
+        row = ' & '.join(row)
+        rows.append(row)
+    array = r' \\ '.join(rows)
+    center = [r'\begin{center}', r'\end{center}'] if center is True \
+        else ['', '']
+    shape = r'''
+    %s
+    {\arraycolsep=0pt \def\arraystretch{0} \LARGE 
+    $\begin{array}{%s} 
+    %s 
+    \end{array}$} 
+    %s
+    ''' % (center[0], l_r, array, center[1])
+    return shape
+
+
+def draw_sphere(colour="blue!10!white", scale=1):
+    sphere = r"""
+    \begin{tikzpicture}
+    \draw[scale=%s] (-1,0) arc (180:360:1cm and 0.5cm);
+    \draw[dashed, scale=%s] (-1,0) arc (180:0:1cm and 0.5cm);
+    \draw[scale=%s] (0,1) arc (90:270:0.5cm and 1cm);
+    \draw[dashed, scale=%s] (0,1) arc (90:-90:0.5cm and 1cm);
+    \draw[scale=%s] (0,0) circle (1cm);
+    \shade[ball color=%s,opacity=0.20, scale=%s] (0,0) circle (1cm);
+    \end{tikzpicture}
+    """ % (scale, scale, scale, scale, scale, colour, scale)
+    return sphere
+
+
+def draw_cone(colour="blue!5!white", scale=1):
+    cone = r"""
+    \begin{tikzpicture}
+    \draw[scale=%s] (-1,0) arc (180:360:1cm and 0.5cm) -- (0,3) -- cycle;
+    \draw[dashed, scale=%s] (-1,0) arc (180:0:1cm and 0.5cm);
+    \shade[left color=%s,right color=%s, opacity=0.3, scale=%s] 
+    (-1,0) arc (180:360:1cm and 0.5cm) -- (0,3) -- cycle;
+    \end{tikzpicture}
+    """ % (scale, scale, colour, colour, scale)
+    return cone
+
+
+def draw_cylinder(colour="blue", scale=0.7):
+    cylinder = r"""
+    \begin{tikzpicture}
+    \fill[top color=%s!50!,
+          bottom color=%s!10,
+          middle color=%s,shading=axis,opacity=0.25, scale=%s] 
+          (0,0) circle (2cm and 0.5cm);
+    \fill[left color=%s!50!,
+          right color=%s!50!,
+          middle color=%s!50,shading=axis,opacity=0.25, scale=%s] 
+          (2,0) -- (2,6) arc (360:180:2cm and 0.5cm) -- (-2,0) 
+          arc (180:360:2cm and 0.5cm);
+    \fill[top color=%s!90!,bottom color=%s!2,
+          middle color=%s!30,shading=axis,opacity=0.25, scale=%s] 
+          (0,6) circle (2cm and 0.5cm);
+
+    \draw[scale=%s] (-2,6) -- (-2,0) arc (180:360:2cm and 0.5cm) 
+    -- (2,6) ++ (-2,0) circle (2cm and 0.5cm);
+    \draw[densely dashed, scale=%s] (-2,0) arc (180:0:2cm and 0.5cm);
+    \end{tikzpicture}
+    """ % (colour, colour, colour, scale, colour, colour, colour, scale,
+           colour, colour, colour, scale, scale, scale)
+    return cylinder
+
+
+def draw_cuboid(colour="blue", scale=1, width=2, height=2, depth=2):
+    width = width * scale
+    height = height * scale
+    depth = depth * scale
+    cuboid = r"""
+    \begin{tikzpicture}
+    \coordinate (O) at (0,0,0);
+    \coordinate (A) at (0,%s,0);
+    \coordinate (B) at (0,%s,%s);
+    \coordinate (C) at (0,0,%s);
+    \coordinate (D) at (%s,0,0);
+    \coordinate (E) at (%s,%s,0);
+    \coordinate (F) at (%s,%s,%s);
+    \coordinate (G) at (%s,0,%s);
+
+    \draw[black,fill=%s!80] (O) -- (C) -- (G) -- (D) -- cycle;
+    \draw[black,fill=%s!30] (O) -- (A) -- (E) -- (D) -- cycle;
+    \draw[black,fill=%s!10] (O) -- (A) -- (B) -- (C) -- cycle;
+    \draw[black,fill=%s!20,opacity=0.8] (D) -- (E) -- (F) -- (G) -- cycle;
+    \draw[black,fill=%s!20,opacity=0.6] (C) -- (B) -- (F) -- (G) -- cycle;
+    \draw[black,fill=%s!20,opacity=0.8] (A) -- (B) -- (F) -- (E) -- cycle;
+    \end{tikzpicture}
+    """ % (height, height, depth, depth, width, width,
+           height, width, height, depth, width, depth,
+           colour, colour, colour, colour, colour, colour)
+    return cuboid
+
+
+def draw_square_based_pyramid(colour="blue", scale=1, rotate=0,
+                              width=10, height=10, depth=10):
+    width = width * scale
+    depth = depth * scale
+    height = height * scale
+    pyramid = r"""
+    \tikzset{pics/pyramidoid/.style={code={
+    \tikzset{pyramidoid/.cd,#1}
+    \def\pv##1{\pgfkeysvalueof{/tikz/pyramidoid/##1}}
+    \draw [solid, fill=%s!30, opacity=.5, pic actions, rotate=%s]
+        (0,0,0) coordinate (o) 
+        (-\pv{scale}*\pv{width},0,0) coordinate (a)
+        (-\pv{scale}*\pv{width},\pv{scale}*\pv{depth},0) coordinate (b) 
+        (0,\pv{scale}*\pv{depth},0) coordinate (c) 
+        (-\pv{scale}*\pv{width}/2,
+            \pv{scale}*\pv{depth}/2,
+            \pv{scale}*\pv{height}) coordinate (d) 
+        (b) edge[densely dashed] (a)
+        edge[densely dashed] (c) edge[densely dashed] (d)
+        (o) -- (a) -- (d) -- (o) -- (c) -- (d) ;
+    }},
+      pyramidoid/.cd,
+      width/.initial=10,
+      height/.initial=5,
+      depth/.initial=10,
+      scale/.initial=.2,
+    }
+    \begin{tikzpicture}
+    [x={(1cm,0cm)},y={(30:1cm)},z={(0cm,1cm)},line cap=round,line join=round]
+      \pic {pyramidoid={width=%s, height=%s, depth=%s}};
+    \end{tikzpicture}
+    """ % (colour, rotate, width, height, depth)
+    return pyramid
+
+
+def draw_prism(colour="blue", scale=1):
+    prism = r"""
+    \begin{tikzpicture}[line cap=round,line join=round,
+        x={(-0.5cm,-0.5cm)},y={(1cm,0cm)},z={(0cm,1cm)}, scale=%s
+        ]
+    \def\b{3}
+    \def\L{4}
+    \def\a{60} 
+    \foreach\i in {0,1}
+    {
+        \begin{scope}[canvas is yz plane at x=-\L*\i]
+        \coordinate (A\i) at (0,0);
+        \coordinate (B\i) at (-\b,0);
+        \coordinate (C\i) at (180-\a:\b);
+        \coordinate (D\i) at (0,0); 
+        \fill[%s,opacity=0.1] (A\i) -- (B\i) -- (C\i) -- cycle;
+        \end{scope}
+    }
+
+    \draw[gray,dashed] (B0) -- (B1);
+    \draw[gray,dashed] (A1) -- (B1) -- (C1);
+    \draw[draw=black, fill=%s!50, fill opacity=0.2] 
+    (D0) -- (C0) -- (C1) -- (A1) -- (A0) -- (B0) -- (C0) -- (A0);
+    \end{tikzpicture}
+    """ % (scale, colour, colour)
+    return prism
